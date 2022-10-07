@@ -7,8 +7,3 @@ pub struct Material {
     pub specular_exponent: f64,
     pub reflection: f64,
 }
-
-pub struct Light {
-    pub position: Array1<f64>,
-    pub intensity: f64,
-}

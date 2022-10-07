@@ -5,6 +5,7 @@ pub struct Sphere {
     pub position: Array1<f64>,
     pub radius: f64,
     pub material: Material,
+    pub is_light: bool,
 }
 
 impl Sphere {
