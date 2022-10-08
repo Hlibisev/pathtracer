@@ -6,6 +6,7 @@ pub struct Material {
     pub specular_color: Array1<f64>,
     pub specular_exponent: f64,
     pub reflection: f64,
+    pub raphess: f64
 }
 
 pub struct Light {

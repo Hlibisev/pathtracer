@@ -4,35 +4,39 @@ use ndarray::array;
 
 pub fn get_light_and_obj() -> (Vec<Sphere>, Vec<Light>) {
     let ruby: Material = Material {
-        albedo_color: array![0.1745, 0.01175, 0.01175],
-        diffuse_color: array![0.61424, 0.04136, 0.04136],
-        specular_color: array![0.727811, 0.296648, 0.296648],
-        specular_exponent: 120.,
-        reflection: 0.6,
+        albedo_color: array![0.0, 0.8, 0.8],
+        diffuse_color: array![0.18275, 0.17, 0.22525],
+        specular_color: array![0.05375, 0.05, 0.06625],
+        specular_exponent: 0.4,
+        reflection: 0.,
+        raphess: 0.2,
     };
 
     let gray: Material = Material {
-        albedo_color: array![0.05375, 0.05, 0.06625],
+        albedo_color: array![0.0, 0.8, 0.8],
         diffuse_color: array![0.18275, 0.17, 0.22525],
         specular_color: array![0.05375, 0.05, 0.06625],
-        specular_exponent: 2.,
-        reflection: 0.01,
+        specular_exponent: 0.8,
+        reflection: 0.,
+        raphess: 0.5,
     };
 
     let emerlad: Material = Material {
-        albedo_color: array![0.0215, 0.1745, 0.0215],
-        diffuse_color: array![0.07568, 0.61424, 0.07568],
-        specular_color: array![0.2, 1., 0.2],
-        specular_exponent: 10.,
-        reflection: 0.2,
+        albedo_color: array![0.0, 0.8, 0.8],
+        diffuse_color: array![0.18275, 0.17, 0.22525],
+        specular_color: array![0.05375, 0.05, 0.06625],
+        specular_exponent: 0.8,
+        reflection: 0.,
+        raphess: 0.1,
     };
 
     let mirror: Material = Material {
-        albedo_color: array![0.3, 0.3, 0.3],
-        diffuse_color: array![0.0, 0.0, 0.0],
-        specular_color: array![1., 1., 1.],
-        specular_exponent: 1500.,
-        reflection: 1.,
+        albedo_color: array![0.0, 0.8, 0.8],
+        diffuse_color: array![0.18275, 0.17, 0.22525],
+        specular_color: array![0.05375, 0.05, 0.06625],
+        specular_exponent: 0.8,
+        reflection: 0.,
+        raphess: 0.99,
     };
 
     let shpere: Sphere = Sphere {
@@ -62,16 +66,18 @@ pub fn get_light_and_obj() -> (Vec<Sphere>, Vec<Light>) {
     let spheres: Vec<Sphere> = vec![shpere, sphere2, sphere3, sphere4];
 
     let light: Light = Light {
-        position: array![5., 10., 3.],
-        intensity: 2.,
+        position: array![10., 10., 3.],
+        intensity: 1.,
     };
 
-    let light2: Light = Light {
-        position: array![-5., -10., 2.],
-        intensity: 2.,
-    };
+    // let light2: Light = Light {
+    //     position: array![-5., -10., 2.],
+    //     intensity: 2.,
+    // };
 
-    let lights: Vec<Light> = vec![light, light2];
+    let lights: Vec<Light> = vec![light];
 
     return (spheres, lights);
 }
+
+

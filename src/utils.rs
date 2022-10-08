@@ -1,3 +1,5 @@
+use std::ops::Div;
+
 use image::RgbImage;
 use ndarray::{Array1, Array3};
 
@@ -18,4 +20,21 @@ pub fn array_to_image(arr: Array3<u8>) -> RgbImage {
 
     RgbImage::from_raw(width as u32, height as u32, raw)
         .expect("container should have the right size for the image dimensions")
+}
+
+
+
+pub fn shlick(spec: &Array1<f64>, half: &Array1<f64>, dir: &Array1<f64>) -> Array1<f64> {
+    return spec + (1.0 - spec) * (1.0 - half.dot(dir)).powi(5)
+}
+
+pub fn distribution(norm: &Array1<f64>, half: &Array1<f64>, alpha: f64) -> f64 {
+    return alpha
+        .powi(2)
+        .div(3.14)
+        .div((norm.dot(half).powi(2) * (alpha.powi(2) - 1.0) + 1.0).powi(2));
+}
+
+pub fn geometric(norm: &Array1<f64>, dir: &Array1<f64>, k: f64) -> f64 {
+    return norm.dot(dir) / (norm.dot(dir) * (1.0 - k) + k);
 }

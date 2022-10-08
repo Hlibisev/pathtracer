@@ -7,7 +7,7 @@ use data::*;
 use ndarray::{array, s, Array1, Array3, ArrayBase, Dim, OwnedRepr};
 use objects::Sphere;
 use phong::Light;
-use utils::{array_to_image, normalize, reflect};
+use utils::{array_to_image, normalize, reflect, shlick, geometric, distribution};
 
 use std::f64::consts::PI;
 use std::ops::{Add, Mul};
@@ -43,33 +43,39 @@ fn simple_raycast(
     let norm = nearest_object.get_normal(&point);
 
     if is_intersected {
+        let mut color: Array1<f64> = array![0.0, 0.0, 0.0];
+
         for light in lights {
             let light_dir = normalize(&light.position - &point);
 
             // TODO: named break
-            let mut i = 0;
-            for (index, object) in objects.iter().enumerate() {
-                if (index != nearest_index) && (object.ray_intersect(&point, &light_dir).1 < 200.0)
-                {
-                    i = 1;
-                    break;
-                }
-            }
-            if i > 0 {
-                break;
-            }
+            // let mut i = 0;
+            // for (index, object) in objects.iter().enumerate() {
+            //     if (index != nearest_index) && (object.ray_intersect(&point, &light_dir).1 < 200.0)
+            //     {
+            //         i = 1;
+            //         break;
+            //     }
+            // }
+            // if i > 0 {
+            //     break;
+            // }
 
-            intensity += light_dir.dot(&norm).max(0.0) * light.intensity;
-            specular_intensity += reflect(&norm, &light_dir)
-                .dot(dir)
-                .max(0.0)
-                .powf(nearest_object.material.specular_exponent)
-                .mul(light.intensity);
+            let inv_dir = -dir;
+            let half = normalize(&inv_dir + &light_dir);
+
+            let BDRF_div = 4.0 * inv_dir.dot(&norm) * light_dir.dot(&norm);
+            //distribution(&norm, &half, nearest_object.material.specular_exponent)
+            
+            let BDRF = distribution(&norm, &half, nearest_object.material.specular_exponent)
+                .mul(shlick(&nearest_object.material.albedo_color, &half, &inv_dir))
+                .mul(shlick(&nearest_object.material.albedo_color, &half, &light_dir))
+                .mul(geometric(&norm, &inv_dir,nearest_object.material.raphess))
+                .mul(1.0 / BDRF_div)
+                .add(&nearest_object.material.albedo_color);
+
+            color = color + BDRF * light_dir.dot(&norm) * light.intensity;
         }
-
-        let mut color = &nearest_object.material.albedo_color
-            + &nearest_object.material.diffuse_color * intensity
-            + &nearest_object.material.specular_color * specular_intensity;
 
         let reflect_dir = reflect(&norm, dir);
         let reflect_orig: ArrayBase<OwnedRepr<f64>, Dim<[usize; 1]>>;
@@ -91,7 +97,7 @@ fn simple_raycast(
         return array![0.0, 0.0, 0.0];
     }
 
-    return array![0.05, 0.05, 0.05];
+    return array![0.075, 0.7, 0.7];
 }
 
 fn main() {
