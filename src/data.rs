@@ -56,7 +56,7 @@ pub fn get_light_and_obj() -> Vec<Box<dyn Object>> {
     let sphere3 = Sphere::new(array![5.6, 3., -21.0], 4., mirror, false);
     // let sphere4 = Sphere::new(array![1., -4., -15.0], 4., emerlad, true);
     let sphere5 = Sphere::new(array![-6.5, -1.5, -17.], 1.6, emerlad2, true);
-    
+
     let plane = Plane::new(
         [
             array![0.0, -3.5, 0.0],
@@ -65,7 +65,11 @@ pub fn get_light_and_obj() -> Vec<Box<dyn Object>> {
         ],
         emerlad3,
         // array![[-9.2, 9.2], [-5.0, 5.0], [-20.0, -7.0]],
-        array![[-f64::INFINITY, f64::INFINITY], [-f64::INFINITY, f64::INFINITY], [-f64::INFINITY, f64::INFINITY]],
+        array![
+            [-f64::INFINITY, f64::INFINITY],
+            [-f64::INFINITY, f64::INFINITY],
+            [-f64::INFINITY, f64::INFINITY]
+        ],
         false,
     );
     let objects: Vec<Box<dyn Object>> = vec![

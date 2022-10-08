@@ -10,7 +10,7 @@ use objects::{Object, Sphere};
 use ndarray_rand::rand;
 use ndarray_rand::rand_distr::{Distribution, Uniform, UnitSphere};
 use ndarray_rand::RandomExt;
-use utils::{array_to_image, normalize, reflect};
+use utils::{array_to_image, distribution, geometric, normalize, reflect, shlick};
 
 use ndarray_rand::rand::Rng;
 use std::collections::LinkedList;
@@ -23,7 +23,6 @@ fn simple_raycast(
     objects: &Vec<Box<dyn Object>>,
     depth: u8,
 ) -> Array1<f64> {
-
     if depth == 5 {
         return array![0.1, 0.1, 0.1];
     }
@@ -69,24 +68,39 @@ fn simple_raycast(
             objects,
             depth + 1_u8,
         );
-        let color = (&nearest_object.material().diffuse_color + 0.2)
-            * light
-            * half_unit_sphere_vector.dot(&norm);
+
+        // BDRF
+        let inv_dir = -dir;
+        let half = normalize(&inv_dir + &half_unit_sphere_vector);
+        // println!("{}", half.dot(&norm));
+
+        let BDRF_div = 4.0 * inv_dir.dot(&norm) * half_unit_sphere_vector.dot(&norm);
+        // distribution(&norm, &half, 0.6)
+        let BDRF = 1.
+            .mul(shlick(&array![0.0, 1.0, 1.0], &half, &inv_dir))
+            .mul(geometric(&norm, &inv_dir,0.05));
+
+        
+
+        // let BDRF = shlick(&array![0.77, 0c.78, 0.78], &half, &inv_dir);
+        // println!("{}", geometric(&norm, &inv/_dir, 0.05));
+        // println!("{}", &BDRF / BDRF_div);
+        let color = (BDRF / BDRF_div) * light * half_unit_sphere_vector.dot(&norm);
         return color;
     }
 
     if depth > 0_u8 {
-        return array![0.8, 0.8, 0.8];
+        return array![1.0, 1.0, 1.0];
     }
 
-    return array![0.8, 0.8, 0.8];
+    return array![1.0, 1.0, 1.0];
 }
 
 fn main() {
     let objects = get_light_and_obj();
 
     let fov = PI / 3.4;
-    let n = 1200;
+    let n = 500;
     let mut image = Array3::<f64>::zeros((n, n, 3));
 
     let widght_screen = (fov / 2.0).tan() * 2.0;
@@ -108,14 +122,15 @@ fn main() {
 
             let mut slice = image.slice_mut(s![i as usize, j as usize, ..]);
 
-            for _ in 1..256 {
+            for _ in 0..64 {
                 let x_shift = (rng.gen::<f64>() - 0.5) / shape_1 * widght_screen;
                 let y_shift = (rng.gen::<f64>() - 0.5) / shape_2 * height_screen;
+
                 let dir = normalize(array![x + x_shift, y + y_shift, -1.]);
 
                 slice += &(simple_raycast(&orig, &dir, &objects, 0_u8) * 255.);
             }
-            slice /= 256.0;
+            slice /= 64.0;
         }
     }
 
